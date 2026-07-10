@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+
+body {
+    background: radial-gradient(ellipse at 20% 20%, #555 0%, #394d6f 60%, #363636 100%);
+    color: white;
+    font-family: 'Instrument Sans', sans-serif;
+}
