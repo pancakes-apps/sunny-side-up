@@ -48,7 +48,7 @@ const editTime = () => {
 </script>
 
 <template>
-    <div class="flex w-full md:w-1/2 p-4 flex flex-col items-center">
+    <div class="flex w-full md:w-[60%] p-4 flex flex-col items-center">
         <div class="rounded-full bg-white/40 mb-8 flex items-center text-sm">
             <p :class="['px-4 py-2 rounded-full cursor-pointer', sessionId === 1 ? 'bg-black' : '']">Session One</p>
             <p :class="['px-4 py-2 rounded-full cursor-pointer', sessionId === 2 ? 'bg-black' : '']">Session Two</p>
@@ -56,29 +56,43 @@ const editTime = () => {
 
         <div class="w-full">
             <p v-if="!editSessionTime" :class="['text-9xl transition text-center', runningSessionId ? '' : 'opacity-50']">{{ displaySessionTime }}</p>
+
             <div v-else class="text-9xl flex items-center justify-center">
-                <div>
-                    <span class="text-lg text-white/70">hours:</span>
-                    <input type="text" class="w-20 outline-0 border-0" v-model="sessionTimeInHours">
+                <div class="flex items-center">
+                    <input placeholder="00" type="number" min="0" class="outline-0 border-0 no-spinner w-42" v-model="sessionTimeInHours">
+                    <p>:</p>
                 </div>
-                <p>:</p>
-                <div>
-                    <span class="text-lg text-white/70">minutes:</span>
-                    <input type="text" class="w-20 outline-0 border-0" v-model="sessionTimeInMinutes">
+
+                <div class="flex items-center">
+                    <input placeholder="00" type="number" min="0" max="59" class="outline-0 border-0 no-spinner w-42" v-model="sessionTimeInMinutes">
+                    <p>:</p>
                 </div>
-                <p>:</p>
-                <div>
-                    <span class="text-lg text-white/70">seconds:</span>
-                    <input type="text" class="w-20 outline-0 border-0" v-model="sessionTimeInSeconds">
+
+                <div class="flex flex-col">
+                    <input placeholder="00" type="number" min="0" max="59" class="outline-0 border-0 no-spinner w-42" v-model="sessionTimeInSeconds">
                 </div>
             </div>
         </div>
 
         <!-- Time -->
-        <div class="mt-5 space-x-4">
+        <div class="mt-5 flex items-center gap-3">
             <button class="cursor-pointer" @click="startSession">start</button>
             <button class="cursor-pointer" @click="pauseSession">stop</button>
-            <button class="cursor-pointer" @click="editTime">{{editSessionTime ? 'Save' : 'Edit'}}</button>
+            <div class="flex items-center gap-2">
+                <button class="cursor-pointer" @click="editTime">{{editSessionTime ? 'save' : 'edit'}}</button>
+                <button class="cursor-pointer" v-if="editSessionTime" @click="editSessionTime = false">cancel</button>
+            </div>
         </div>
     </div>
 </template>
+
+<style scoped>
+.no-spinner::-webkit-outer-spin-button,
+.no-spinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.no-spinner {
+  -moz-appearance: textfield;
+}
+</style>

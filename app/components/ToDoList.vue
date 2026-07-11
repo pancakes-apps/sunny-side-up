@@ -26,7 +26,7 @@ const handleAddNewGoal = (description: string) => {
 </script>
 
 <template>
-    <div class="flex w-full md:w-1/2 p-7 flex flex-col items-start justify-center">
+    <div class="flex w-full md:w-[40%] p-7 flex flex-col items-start justify-center">
         <h1 class="text-3xl mb-5">Goals for today</h1>
         <!-- Goals -->
         <div>
