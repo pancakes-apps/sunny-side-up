@@ -1,58 +1,60 @@
 <script lang="ts" setup>
-const sessionId = ref<number>(1)
+const timerStore = useTimerStore()
 
-const runningSessionId = ref<number|undefined>()
+const { sessionId } = defineProps<{ sessionId: number }>()
 
-const sessionTime = ref<number>(4 * 60 * 60) // start with 4 hours
+const isSessionRunning = computed(() => {
+    return timerStore.runningSessionId && timerStore.activeSession?.id === sessionId
+})
 
+const sessionTime = timerStore.getSessionTime(sessionId)
+
+const sessionTimeInHours = ref<number>(hour(sessionTime.value))
+const sessionTimeInMinutes = ref<number>(min(sessionTime.value))
+const sessionTimeInSeconds = ref<number>(sec(sessionTime.value))
+
+// component 
 const editSessionTime = ref<boolean>(false)
 
-const sessionTimeInHours = ref<number>(Math.floor(sessionTime.value / 3600))
-const sessionTimeInMinutes = ref<number>(Math.floor(sessionTime.value % 3600))
-const sessionTimeInSeconds = ref<number>(sessionTime.value % 60)
-
+// component
 const displaySessionTime = computed( () => {
-    const h = String(Math.floor(sessionTime.value / 3600)).padStart(2,'0')
-    const m = String(Math.floor((sessionTime.value % 3600) / 60)).padStart(2,'0')
-    const s = String(sessionTime.value % 60).padStart(2,'0')
+    const h = String(hour(sessionTime.value)).padStart(2,'0')
+    const m = String(min((sessionTime.value))).padStart(2,'0')
+    const s = String(sec(sessionTime.value)).padStart(2,'0')
     return `${h}:${m}:${s}`
 })
 
-const startSession = () => {
-    const sessionIntervalId = setInterval(() => {
-        if (sessionTime.value < 0) {
-            clearInterval(sessionIntervalId)
-            runningSessionId.value = undefined
-        } else {
-            sessionTime.value--
-        }
-    }, 1000)
-
-    runningSessionId.value = sessionIntervalId
+const handleStartSession = () => {
+    timerStore.startSession(sessionId)
 }
 
-const pauseSession = () => {
-    clearInterval(runningSessionId.value)
-    runningSessionId.value = undefined
+const handlePauseSession = () => {
+    timerStore.pauseSession(sessionId)
 }
 
-const editTime = () => {
+const handleToggleEditSection = () => {
+    // toggle the section and update the time in hours and mins
+    editSessionTime.value = !editSessionTime.value
+
+    const runningSession = timerStore.getSessionTime(sessionId)
+    sessionTimeInHours.value = hour(runningSession.value)
+    sessionTimeInMinutes.value = min(runningSession.value)
+    sessionTimeInSeconds.value = sec(runningSession.value)
+
+}
+
+const handleEditTime = () => {
     if (editSessionTime.value) {
-        sessionTime.value = (sessionTimeInHours.value * 60 * 60) + (sessionTimeInMinutes.value * 60) + sessionTimeInSeconds.value
+        timerStore.editTime(sessionId, (sessionTimeInHours.value * 60 * 60) + (sessionTimeInMinutes.value * 60) + sessionTimeInSeconds.value)
     }
 
-    editSessionTime.value = !editSessionTime.value
+    handleToggleEditSection()
 }
-
-const toggleSessions = (id:number) => {
-    sessionId.value = id
-}
-
 </script>
 
 <template>
     <div class="w-full">
-        <p v-if="!editSessionTime" :class="['text-9xl transition text-center', runningSessionId ? '' : 'opacity-50']">{{ displaySessionTime }}</p>
+        <p v-if="!editSessionTime" :class="['text-9xl transition text-center', isSessionRunning ? '' : 'opacity-50']">{{ displaySessionTime }}</p>
 
         <div v-else class="text-9xl flex items-center justify-center">
             <div class="flex items-center">
@@ -73,10 +75,10 @@ const toggleSessions = (id:number) => {
 
     <!-- Time -->
     <div class="mt-5 flex items-center gap-3">
-        <button class="cursor-pointer" v-if="!editSessionTime" @click="startSession">start</button>
-        <button class="cursor-pointer" v-if="!editSessionTime" @click="pauseSession">stop</button>
+        <button class="cursor-pointer" v-if="!editSessionTime" @click="handleStartSession">start</button>
+        <button class="cursor-pointer" v-if="!editSessionTime" @click="handlePauseSession">stop</button>
         <div class="flex items-center gap-2">
-            <button class="cursor-pointer" @click="editTime">{{editSessionTime ? 'save' : 'edit'}}</button>
+            <button class="cursor-pointer" @click="handleEditTime">{{editSessionTime ? 'save' : 'edit'}}</button>
             <button class="cursor-pointer" v-if="editSessionTime" @click="editSessionTime = false">cancel</button>
         </div>
     </div>

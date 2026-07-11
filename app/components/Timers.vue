@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-const sessionId = ref<number>(1)
+const timerStore = useTimerStore()
+
+const sessionId = ref<number>(timerStore.activeSession ? timerStore.activeSession.id : 1)
 
 const toggleSessions = (id:number) => {
     sessionId.value = id
@@ -14,18 +16,7 @@ const toggleSessions = (id:number) => {
             <button @click="() => toggleSessions(2)" :class="['transition px-4 py-2 rounded-full cursor-pointer', sessionId === 2 ? 'bg-black' : '']">Session Two</button>
         </div>
 
-        <TimerSession id="1" v-if="sessionId === 1" />
-        <TimerSession id="2" v-else/>
+        <TimerSession :session-id="1" v-if="sessionId === 1" />
+        <TimerSession :session-id="2" v-else/>
     </div>
 </template>
-
-<style scoped>
-.no-spinner::-webkit-outer-spin-button,
-.no-spinner::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-.no-spinner {
-  -moz-appearance: textfield;
-}
-</style>
