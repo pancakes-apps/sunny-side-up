@@ -33,12 +33,12 @@ const handleAddNewGoal = (description: string) => {
             <div v-if="goalsStore.goals?.length">
                 <div class="space-x-2" v-for="goal in goalsStore.goals" :key="goal.id">
                     <input type="checkbox" v-model="goal.checked">
-                    <input type="text" v-model="goal.description" placeholder="what are we doing today?" class="outline-0 border-0">
+                    <input type="text" v-model="goal.description" placeholder="what are we doing today?" class="outline-0 border-0 text-lg">
                 </div>
             </div>
             <div class="space-x-2">
                 <input type="checkbox" v-model="newGoal.checked">
-                <input type="text" v-model="newGoal.description" placeholder="what are we doing today?" class="outline-0 border-0" @keypress.enter="() => handleAddNewGoal(newGoal.description)">
+                <input type="text" v-model="newGoal.description" placeholder="what are we doing today?" class="outline-0 border-0 text-lg" @keypress.enter="() => handleAddNewGoal(newGoal.description)">
             </div>
         </div>
     </div>
