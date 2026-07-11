@@ -12,7 +12,7 @@ export const useTimerStore = defineStore('timer-store', () => {
     const runningSessionId = ref<number|undefined>()
 
     const activeSession = computed( () => {
-        return sessions.value.filter(s => s.active)[0]
+        return sessions.value.find(s => s.active)
     })
 
     const editTime = (sessionId: number, time: number) => {
@@ -33,15 +33,13 @@ export const useTimerStore = defineStore('timer-store', () => {
         const sessionIntervalId = setInterval(() => {
             if (activeSession.value?.id === 1) {
                 if (sessionOneTime.value === 0) {
-                    clearInterval(sessionIntervalId)
-                    runningSessionId.value = undefined
+                    sessionEnded(sessionIntervalId)
                 } else {
                     sessionOneTime.value--
                 }
             } else {
-                if (sessionTwoTime.value < 0) {
-                    clearInterval(sessionIntervalId)
-                    runningSessionId.value = undefined
+                if (sessionTwoTime.value === 0) {
+                    sessionEnded(sessionIntervalId)
                 } else {
                     sessionTwoTime.value--
                 }      
@@ -49,6 +47,25 @@ export const useTimerStore = defineStore('timer-store', () => {
         }, 1000)
 
         runningSessionId.value = sessionIntervalId
+    }
+
+    const sessionEnded = (sessionIntervalId: number) => {
+        clearInterval(sessionIntervalId)
+        runningSessionId.value = undefined
+
+        // deactivate running session
+        const current = sessions.value.find(s => s.active)
+        if (current) {
+            current.active = false
+
+            // activate the other one
+            const next = sessions.value.find(s => s.id !== current.id)
+            if (next) {
+                next.active = true
+
+                alert(`session: ${current.id} has ended now you can start with session ${next.id}`)
+            }
+        }
     }
 
     const pauseSession = (sessionId: number) => {
