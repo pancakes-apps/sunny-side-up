@@ -2,7 +2,7 @@
 
 A simple app that helps you split your day into two sessions, with a timer and a to-do list to keep you on track. PWA support is already configured, so once you build and deploy it (or serve the production build), you can install it on your phone or desktop and use it like a native app.
 
-Part of the [Pancakes](https://usepancakes.com) family — simple, focused apps, built with love and no funny business. 🥞
+Part of the [Pancakes](https://usepancakes.com) family — simple, focused apps, built with love. 🥞
 
 ## Prerequisites
 
