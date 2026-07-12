@@ -10,7 +10,6 @@ export const useGoalsStore = defineStore('goals-store', () => {
         goals.value = goals.value?.filter((g) => g.id !== id)
     }
 
-
     return {
         goals,
         addGoal,
