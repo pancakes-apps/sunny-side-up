@@ -3,4 +3,5 @@
         <ToDoList class="order-2 md:order-1" />
         <Timers class="order-1 md:order-2" />
     </div>
+    <LayoutFooter />
 </template>
