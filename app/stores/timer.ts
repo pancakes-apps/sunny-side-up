@@ -30,18 +30,31 @@ export const useTimerStore = defineStore('timer-store', () => {
             return
         }
 
+        if (runningSessionId.value !== undefined) {
+            return
+        }
+
+        const startTime = Date.now()
+        const duration = activeSession.value?.id === 1 ? sessionOneTime.value * 1000 : sessionTwoTime.value * 1000
+
         const sessionIntervalId = setInterval(() => {
+            const remaining = duration - (Date.now() - startTime)
+
             if (activeSession.value?.id === 1) {
-                if (sessionOneTime.value === 0) {
+                if (remaining <= 0) {
                     sessionEnded(sessionIntervalId)
+
+                    return
                 } else {
-                    sessionOneTime.value--
+                    sessionOneTime.value = Math.floor(remaining / 1000)
                 }
             } else {
-                if (sessionTwoTime.value === 0) {
+                if (remaining <= 0) {
                     sessionEnded(sessionIntervalId)
+                    
+                    return
                 } else {
-                    sessionTwoTime.value--
+                    sessionTwoTime.value = Math.floor(remaining / 1000)
                 }      
             }
         }, 1000)
