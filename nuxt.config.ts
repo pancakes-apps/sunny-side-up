@@ -19,6 +19,7 @@ export default defineNuxtConfig({
         head: {
             title: 'Sunny Side Up',
                 link: [
+                    { rel: 'icon', type: 'image/x-icon', href: '/favicon.svg' },
                     { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap' },
                 ]
             }
