@@ -15,4 +15,6 @@ export const useGoalsStore = defineStore('goals-store', () => {
         addGoal,
         removeGoal,
     }
+}, {
+    persist: true,
 })

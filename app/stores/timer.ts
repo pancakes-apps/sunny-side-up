@@ -113,4 +113,6 @@ export const useTimerStore = defineStore('timer-store', () => {
         startSession,
         getSessionTime,
     }
+}, {
+    persist: true,
 })
