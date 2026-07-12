@@ -10,10 +10,10 @@ const toggleSessions = (id:number) => {
 </script>
 
 <template>
-    <div class="flex w-full md:w-[60%] p-4 flex flex-col items-center">
-        <div class="rounded-full bg-white/40 mb-8 flex items-center text-sm">
-            <button @click="() => toggleSessions(1)" :class="['transition px-4 py-2 rounded-full cursor-pointer', sessionId === 1 ? 'bg-black' : '']">Session One</button>
-            <button @click="() => toggleSessions(2)" :class="['transition px-4 py-2 rounded-full cursor-pointer', sessionId === 2 ? 'bg-black' : '']">Session Two</button>
+    <div class="flex w-full md:w-[60%] h-[60vh] md:h-auto p-4 flex-col items-center md:justify-normal justify-center">
+        <div class="rounded-full bg-white/40 mb-[clamp(1rem,4vw,2rem)] flex items-center text-[clamp(0.75rem,2vw,0.875rem)]">
+            <button @click="() => toggleSessions(1)" :class="['transition px-[clamp(0.75rem,2.5vw,1rem)] py-[clamp(0.375rem,1.5vw,0.5rem)] rounded-full cursor-pointer', sessionId === 1 ? 'bg-black' : '']">Session One</button>
+            <button @click="() => toggleSessions(2)" :class="['transition px-[clamp(0.75rem,2.5vw,1rem)] py-[clamp(0.375rem,1.5vw,0.5rem)] rounded-full cursor-pointer', sessionId === 2 ? 'bg-black' : '']">Session Two</button>
         </div>
 
         <TimerSession :session-id="1" v-if="sessionId === 1" />

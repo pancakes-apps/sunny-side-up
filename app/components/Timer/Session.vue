@@ -54,27 +54,27 @@ const handleEditTime = () => {
 
 <template>
     <div class="w-full">
-        <p v-if="!editSessionTime" :class="['text-9xl transition text-center', isSessionRunning ? '' : 'opacity-50']">{{ displaySessionTime }}</p>
+        <p v-if="!editSessionTime" :class="['text-[clamp(2.5rem,12vw,10rem)] transition text-center', isSessionRunning ? '' : 'opacity-50']">{{ displaySessionTime }}</p>
 
-        <div v-else class="text-9xl flex items-center justify-center">
+        <div v-else class="text-[clamp(2.5rem,12vw,10rem)] flex items-center justify-center">
             <div class="flex items-center">
-                <input placeholder="00" type="number" min="0" class="outline-0 border-0 no-spinner w-42" v-model="sessionTimeInHours">
+                <input placeholder="00" type="number" min="0" class="outline-0 border-0 no-spinner w-16 sm:w-24 md:w-32 lg:w-42" v-model="sessionTimeInHours">
                 <p>:</p>
             </div>
 
             <div class="flex items-center">
-                <input placeholder="00" type="number" min="0" max="59" class="outline-0 border-0 no-spinner w-42" v-model="sessionTimeInMinutes">
+                <input placeholder="00" type="number" min="0" max="59" class="outline-0 border-0 no-spinner w-16 sm:w-24 md:w-32 lg:w-42" v-model="sessionTimeInMinutes">
                 <p>:</p>
             </div>
 
             <div class="flex flex-col">
-                <input placeholder="00" type="number" min="0" max="59" class="outline-0 border-0 no-spinner w-42" v-model="sessionTimeInSeconds">
+                <input placeholder="00" type="number" min="0" max="59" class="outline-0 border-0 no-spinner w-16 sm:w-24 md:w-32 lg:w-42" v-model="sessionTimeInSeconds">
             </div>
         </div>
     </div>
 
     <!-- Time -->
-    <div class="mt-5 flex items-center gap-3">
+    <div class="mt-5 flex items-center justify-center gap-3 text-[clamp(0.875rem,2.5vw,1.25rem)]">
         <button class="cursor-pointer" v-if="!editSessionTime" @click="handleStartSession">start</button>
         <button class="cursor-pointer" v-if="!editSessionTime" @click="handlePauseSession">stop</button>
         <div class="flex items-center gap-2">
