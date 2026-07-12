@@ -25,7 +25,7 @@ export const useTimerStore = defineStore('timer-store', () => {
 
     const startSession = (sessionId: number) => {
         if (activeSession.value?.id !== sessionId) {
-            alert('You must finish your first session to get started')
+            alert(`You must finish the current session to get started. Current session: ${activeSession.value?.id}`)
 
             return
         }
@@ -70,7 +70,7 @@ export const useTimerStore = defineStore('timer-store', () => {
 
     const pauseSession = (sessionId: number) => {
         if (activeSession.value?.id !== sessionId) {
-            alert('You must finish your first session to get started')
+            alert(`You must finish the current session to get started. Current session: ${activeSession.value?.id}`)
 
             return
         }
