@@ -37,7 +37,7 @@ export const useTimerStore = defineStore('timer-store', () => {
             return
         }
 
-        const isSessionOneRunning = activeSession.value?.id
+        const isSessionOneRunning = activeSession.value?.id === 1
 
         startTime.value = Date.now()
         duration.value = isSessionOneRunning ? sessionOneTime.value * 1000 : sessionTwoTime.value * 1000
@@ -64,6 +64,8 @@ export const useTimerStore = defineStore('timer-store', () => {
     const sessionEnded = (sessionIntervalId: number) => {
         clearInterval(sessionIntervalId)
         runningSessionId.value = undefined
+        startTime.value = undefined
+        duration.value = undefined
 
         // deactivate running session
         const current = sessions.value.find(s => s.active)
@@ -89,8 +91,6 @@ export const useTimerStore = defineStore('timer-store', () => {
 
         clearInterval(runningSessionId.value)
         runningSessionId.value = undefined
-        startTime.value = undefined
-        duration.value = undefined
     }
 
     const getSessionTime = (sessionId: number,) => {
@@ -99,6 +99,23 @@ export const useTimerStore = defineStore('timer-store', () => {
         } else {
             return sessionTwoTime
         }
+    }
+
+    const resetToDefaults = () => {
+        if (runningSessionId.value) {
+            clearInterval(runningSessionId.value)
+            runningSessionId.value = undefined
+        }
+
+        sessionOneTime.value = DEFAULT_SESSION_TIME
+        sessionTwoTime.value = DEFAULT_SESSION_TIME
+
+        startTime.value = undefined
+        duration.value = undefined
+        sessions.value = [
+            { id: 1, active: true },
+            { id: 2, active: false }
+        ]
     }
 
     return {
@@ -112,6 +129,7 @@ export const useTimerStore = defineStore('timer-store', () => {
         pauseSession,
         startSession,
         getSessionTime,
+        resetToDefaults,
     }
 }, {
     persist: true,

@@ -18,5 +18,9 @@ const toggleSessions = (id:number) => {
 
         <TimerSession :session-id="1" v-if="sessionId === 1" />
         <TimerSession :session-id="2" v-else/>
+
+        <div>
+            <button class="cursor-pointer mt-10" @click="timerStore.resetToDefaults()">rest everything</button>
+        </div>
     </div>
 </template>
