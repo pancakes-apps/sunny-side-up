@@ -1,30 +1,61 @@
 export const useTimerStore = defineStore('timer-store', () => {
     const DEFAULT_SESSION_TIME:number =  4 * 60 * 60
-
-    const sessions = ref<Session[]>([
-        { id: 1, active: true },
-        { id: 2, active: false }
+    const SESSIONS = ref<Session[]>([
+        { 
+            id: 1,
+            active: true,
+            time: DEFAULT_SESSION_TIME,
+            startedAt: undefined,
+            duration: undefined,
+        },
+        { 
+            id: 2,
+            active: false,
+            time: DEFAULT_SESSION_TIME,
+            startedAt: undefined,
+            duration: undefined,
+        }
     ])
 
-    const startTime = ref<number | undefined>()
-    const duration = ref<number | undefined>()
+    // private ticking clock: not returned from the store, so updating it every second
+    // re-renders the display WITHOUT triggering a localStorage write
+    const nowTick = ref<number>(Date.now())
 
-    const sessionOneTime = ref<number>(DEFAULT_SESSION_TIME)
-    const sessionTwoTime = ref<number>(DEFAULT_SESSION_TIME)
+    const liveRemaining = (session: Session): number => {
+        if (session.startedAt !== undefined && session.duration !== undefined) {
+            return Math.max(Math.floor((session.duration - (nowTick.value - session.startedAt)) / 1000), 0)
+        }
 
-    const runningSessionId = ref<number|undefined>()
+        return session.time
+    }
+
+    const getRemainingSessionTime = (sessionId: number): number => {
+        const session = SESSIONS.value.find(s => s.id === sessionId)
+
+        return session ? liveRemaining(session) : 0
+    }
 
     const activeSession = computed( () => {
-        return sessions.value.find(s => s.active)
+        return SESSIONS.value.find(s => s.active)
     })
 
-    const editTime = (sessionId: number, time: number) => {
-        if ( sessionId === 1 ) {
-            sessionOneTime.value = time
+    // call this when the component is mounted
+    const currentSessionComponentId = ref<number | undefined>()
+    const setCurrentSessionComponentId = (id:number) => {
+        currentSessionComponentId.value = id
+    }
+
+    const displaySessionTime = computed( () => { return getRemainingSessionTime(currentSessionComponentId.value ? currentSessionComponentId.value : 1) },)
+
+    const editTime = (time: number) => {
+        if ( currentSessionComponentId.value === 1 ) {
+            SESSIONS.value[0]!.time = time
         } else {
-            sessionTwoTime.value = time
+            SESSIONS.value[1]!.time = time
         }
     }
+
+    const runningIntervalId = ref<number|undefined>()
 
     const startSession = (sessionId: number) => {
         if (activeSession.value?.id !== sessionId) {
@@ -33,53 +64,26 @@ export const useTimerStore = defineStore('timer-store', () => {
             return
         }
 
-        if (runningSessionId.value !== undefined) {
+        if (runningIntervalId.value !== undefined) {
             return
         }
 
         const isSessionOneRunning = activeSession.value?.id === 1
 
-        startTime.value = Date.now()
-        duration.value = isSessionOneRunning ? sessionOneTime.value * 1000 : sessionTwoTime.value * 1000
+        activeSession.value.startedAt = Date.now()
+        activeSession.value.duration = isSessionOneRunning ? SESSIONS.value[0]!.time * 1000 : SESSIONS.value[1]!.time * 1000
+        nowTick.value = Date.now()
 
         const sessionIntervalId = setInterval(() => {
-            const remaining = duration.value! - (Date.now() - startTime.value!)
+            // only the private clock ticks — persisted state is untouched while running
+            nowTick.value = Date.now()
 
-            if (remaining <= 0) {
+            if (liveRemaining(activeSession.value!) <= 0) {
                 sessionEnded(sessionIntervalId)
-
-                return
-            }
-
-            if (isSessionOneRunning) {
-                sessionOneTime.value = Math.floor(remaining / 1000)
-            } else {
-                sessionTwoTime.value = Math.floor(remaining / 1000)
             }
         }, 1000)
 
-        runningSessionId.value = sessionIntervalId
-    }
-
-    const sessionEnded = (sessionIntervalId: number) => {
-        clearInterval(sessionIntervalId)
-        runningSessionId.value = undefined
-        startTime.value = undefined
-        duration.value = undefined
-
-        // deactivate running session
-        const current = sessions.value.find(s => s.active)
-        if (current) {
-            current.active = false
-
-            // activate the other one
-            const next = sessions.value.find(s => s.id !== current.id)
-            if (next) {
-                next.active = true
-
-                alert(`session: ${current.id} has ended now you can start with session ${next.id}`)
-            }
-        }
+        runningIntervalId.value = sessionIntervalId
     }
 
     const pauseSession = (sessionId: number) => {
@@ -89,48 +93,108 @@ export const useTimerStore = defineStore('timer-store', () => {
             return
         }
 
-        clearInterval(runningSessionId.value)
-        runningSessionId.value = undefined
+        clearInterval(runningIntervalId.value)
+        runningIntervalId.value = undefined
+
+        // freeze the remaining time into `time` (the one write for this run), then
+        // clear the running markers so the session doesn't drain across refreshes
+        activeSession.value.time = liveRemaining(activeSession.value)
+        activeSession.value.startedAt = undefined
+        activeSession.value.duration = undefined
     }
 
-    const getSessionTime = (sessionId: number,) => {
-        if ( sessionId === 1 ) {
-            return sessionOneTime
-        } else {
-            return sessionTwoTime
+    const sessionEnded = (sessionIntervalId: number) => {
+        clearInterval(sessionIntervalId)
+        runningIntervalId.value = undefined
+
+        // capture the session before flipping `active`, otherwise the computed becomes undefined
+        const ended = activeSession.value!
+        ended.startedAt = undefined
+        ended.duration = undefined
+        ended.time = 0
+        ended.active = false
+
+        const next = SESSIONS.value.find(s => s.id !== ended.id)
+        if (next) {
+            next.active = true
+
+            alert(`session: ${next.id === 1 ? 2 : 1} has ended now you can start with session ${next.id}`)
         }
+    }
+
+
+    // this is a one time thing
+    const getSessionTime = () => {
+        return displaySessionTime
     }
 
     const resetToDefaults = () => {
-        if (runningSessionId.value) {
-            clearInterval(runningSessionId.value)
-            runningSessionId.value = undefined
+        if (runningIntervalId.value) {
+            clearInterval(runningIntervalId.value)
+            runningIntervalId.value = undefined
         }
 
-        sessionOneTime.value = DEFAULT_SESSION_TIME
-        sessionTwoTime.value = DEFAULT_SESSION_TIME
-
-        startTime.value = undefined
-        duration.value = undefined
-        sessions.value = [
-            { id: 1, active: true },
-            { id: 2, active: false }
+        SESSIONS.value = [
+            { id: 1, active: true, time: DEFAULT_SESSION_TIME, startedAt: undefined, duration: undefined, },
+            { id: 2, active: false, time: DEFAULT_SESSION_TIME, startedAt: undefined, duration: undefined, }
         ]
     }
 
+    if (import.meta.client) {
+        // ticks never touch localStorage, so persist the remaining time exactly once
+        // when the page is closed, refreshed, or moved to the background
+        const snapshotRunningSession = () => {
+            const session = activeSession.value
+
+            if (session && session.startedAt !== undefined && session.duration !== undefined) {
+                session.time = liveRemaining(session)
+            }
+        }
+
+        window.addEventListener('pagehide', snapshotRunningSession)
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') {
+                snapshotRunningSession()
+            }
+        })
+    }
+
     return {
-        sessionOneTime,
-        sessionTwoTime,
+        SESSIONS,
         activeSession,
-        runningSessionId,
-        startTime,
-        duration,
+        runningIntervalId,
+        displaySessionTime,
+        currentSessionComponentId,
         editTime,
         pauseSession,
         startSession,
         getSessionTime,
         resetToDefaults,
+        getRemainingSessionTime,
+        setCurrentSessionComponentId,
     }
 }, {
-    persist: true,
+    persist: {
+        serializer: {
+            serialize: (state) => {
+                const { runningIntervalId, ...rest } = state
+                return JSON.stringify(rest)
+            },
+            deserialize: (str) => {
+                const parsed = JSON.parse(str)
+
+                if (parsed.SESSIONS) {
+                    parsed.SESSIONS = parsed.SESSIONS.map((session: Session) => ({
+                        ...session,
+                        startedAt: undefined,
+                        duration: undefined,
+                    }))
+                }
+
+                parsed.runningIntervalId = undefined
+
+                return parsed
+            },
+        },
+    },
 })
