@@ -4,17 +4,14 @@ const timerStore = useTimerStore()
 const { sessionId } = defineProps<{ sessionId: number }>()
 
 const isSessionRunning = computed(() => {
-    return timerStore.runningSessionId && timerStore.activeSession?.id === sessionId
+    return timerStore.runningIntervalId && timerStore.activeSession?.id === sessionId
 })
 
-const sessionTime = timerStore.getSessionTime(sessionId)
+const sessionTime = timerStore.getSessionTime()
 
 const sessionTimeInHours = ref<number>(hour(sessionTime.value))
 const sessionTimeInMinutes = ref<number>(min(sessionTime.value))
 const sessionTimeInSeconds = ref<number>(sec(sessionTime.value))
-
-// component 
-const editSessionTime = ref<boolean>(false)
 
 // component
 const displaySessionTime = computed( () => {
@@ -32,24 +29,30 @@ const handlePauseSession = () => {
     timerStore.pauseSession(sessionId)
 }
 
+const editSessionTime = ref<boolean>(false)
+
 const handleToggleEditSection = () => {
     // toggle the section and update the time in hours and mins
     editSessionTime.value = !editSessionTime.value
 
-    const runningSession = timerStore.getSessionTime(sessionId)
-    sessionTimeInHours.value = hour(runningSession.value)
-    sessionTimeInMinutes.value = min(runningSession.value)
-    sessionTimeInSeconds.value = sec(runningSession.value)
-
+    sessionTimeInHours.value = hour(sessionTime.value)
+    sessionTimeInMinutes.value = min(sessionTime.value)
+    sessionTimeInSeconds.value = sec(sessionTime.value)
 }
 
 const handleEditTime = () => {
     if (editSessionTime.value) {
-        timerStore.editTime(sessionId, (sessionTimeInHours.value * 60 * 60) + (sessionTimeInMinutes.value * 60) + sessionTimeInSeconds.value)
+        timerStore.editTime(
+            (sessionTimeInHours.value * 60 * 60) + (sessionTimeInMinutes.value * 60) + sessionTimeInSeconds.value
+        )
     }
 
     handleToggleEditSection()
 }
+
+onMounted(() => {
+    timerStore.setCurrentSessionComponentId(sessionId)
+})
 </script>
 
 <template>

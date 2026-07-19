@@ -2,7 +2,7 @@
 
 
 body {
-    background: radial-gradient(ellipse at 20% 20%, #eb8ff2 0%, #394d6f 60%, #363636 100%);
+    background: radial-gradient(ellipse 100% 100% at 0% 20%, #FB95F1 20%, #9C9FDE 55%, #00B5D5 100%);
     color: white;
     font-family: 'Instrument Sans', sans-serif;
 }
