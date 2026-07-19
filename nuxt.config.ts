@@ -46,7 +46,7 @@ export default defineNuxtConfig({
     
         // lets the SW work while you run `nuxt dev`
         devOptions: {
-          enabled: true,
+          enabled: false,
           type: 'module',
         },
     },
