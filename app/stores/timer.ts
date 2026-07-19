@@ -151,10 +151,57 @@ export const useTimerStore = defineStore('timer-store', () => {
             }
         }
 
+        // the persisted state is only read once at page load, so a second instance of
+        // the app (another tab, PWA window) keeps displaying its stale in-memory copy —
+        // and would clobber localStorage on its next write. Re-read storage whenever
+        // this instance could be behind, mirroring the deserializer's semantics.
+        const STORAGE_KEY = 'timer-store'
+        const syncFromStorage = () => {
+            // a timer running in this tab is the source of truth — never overwrite it
+            if (runningIntervalId.value !== undefined) {
+                return
+            }
+
+            const raw = localStorage.getItem(STORAGE_KEY)
+            if (!raw) {
+                return
+            }
+
+            try {
+                const parsed = JSON.parse(raw)
+
+                if (Array.isArray(parsed.SESSIONS)) {
+                    SESSIONS.value = parsed.SESSIONS.map((session: Session) => ({
+                        ...session,
+                        startedAt: undefined,
+                        duration: undefined,
+                    }))
+                }
+            } catch {
+                // corrupt storage: keep the current in-memory state
+            }
+        }
+
         window.addEventListener('pagehide', snapshotRunningSession)
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'hidden') {
                 snapshotRunningSession()
+            } else {
+                syncFromStorage()
+            }
+        })
+
+        // another tab wrote newer state while this one stayed visible
+        window.addEventListener('storage', (event) => {
+            if (!event.key || event.key === STORAGE_KEY) {
+                syncFromStorage()
+            }
+        })
+
+        // restored from the back/forward cache with stale in-memory state
+        window.addEventListener('pageshow', (event) => {
+            if (event.persisted) {
+                syncFromStorage()
             }
         })
     }
