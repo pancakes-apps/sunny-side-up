@@ -17,7 +17,7 @@ const toggleSessions = (id:number) => {
                 :class="[
                     'transition px-[clamp(0.75rem,2.5vw,1rem)] py-[clamp(0.375rem,1.5vw,0.5rem)] rounded-full cursor-pointer',
                     sessionId === 1 ? 'bg-black' : '',
-                    timerStore.activeSession?.id === 1 ? 'text-cyan-200' : ''
+                    timerStore.activeSession?.id === 1 ? 'text-cyan-200 font-semibold' : ''
                 ]"
             >Session One</button>
             <button 
@@ -25,7 +25,7 @@ const toggleSessions = (id:number) => {
                 :class="[
                     'transition px-[clamp(0.75rem,2.5vw,1rem)] py-[clamp(0.375rem,1.5vw,0.5rem)] rounded-full cursor-pointer',
                     sessionId === 2 ? 'bg-black' : '',
-                    timerStore.activeSession?.id === 2 ? 'text-cyan-200' : '',
+                    timerStore.activeSession?.id === 2 ? 'text-cyan-200 font-semibold' : '',
                 ]"
             >Session Two</button>
         </div>
