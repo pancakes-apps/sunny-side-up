@@ -5,9 +5,9 @@ const goalsStore = useGoalsStore()
 
 <template>
     <div class="flex items-center justify-between group">
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 flex-1">
             <input type="checkbox" v-model="goal.checked">
-            <input v-if="!goal.checked" type="text" v-model="goal.description" placeholder="what are we doing today?" class="outline-0 border-0 text-[clamp(0.875rem,2.5vw,1.125rem)]">
+            <input v-if="!goal.checked" type="text" v-model="goal.description" placeholder="what are we doing today?" class="outline-0 border-0 text-[clamp(0.875rem,2.5vw,1.125rem)] w-full">
             <p v-else class="text-[clamp(0.875rem,2.5vw,1.125rem)] line-through">{{ goal.description }}</p>
         </div>
         <span class="cursor-pointer opacity-0 group-hover:opacity-100" @click="() => goalsStore.removeGoal(goal.id)">
