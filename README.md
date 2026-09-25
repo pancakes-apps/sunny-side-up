@@ -83,6 +83,10 @@ That's it — the app should now be running locally, and it will automatically r
 - [Tailwind CSS](https://tailwindcss.com/) — styling
 - [Vite PWA](https://vite-pwa-org.netlify.app/) — makes the app installable and work offline
 
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
 ---
 
 <p align="center">
